@@ -29,8 +29,6 @@ from libcpp cimport bool
 from libc.stdint cimport uintptr_t
 from libc.stdlib cimport calloc, malloc, free
 
-from cuml.utils import zeros
-
 
 cdef extern from "glm/glm_spmg.h" namespace "ML::GLM":
 
@@ -60,7 +58,7 @@ cdef extern from "glm/glm_spmg.h" namespace "ML::GLM":
                              int n_rows,
                              int n_cols,
                              float *h_coef,
-                             float intercept,
+                              float intercept,
                              float *preds,
                              int *gpu_ids,
                              int n_gpus)
@@ -69,7 +67,7 @@ cdef extern from "glm/glm_spmg.h" namespace "ML::GLM":
                              int n_rows,
                              int n_cols,
                              double *h_coef,
-                             double intercept,
+                     double intercept,
                              double *preds,
                              int *gpu_ids,
                              int n_gpus)
@@ -128,7 +126,7 @@ class LinearRegressionMG:
     """
     Single Process, Multi-GPU Linear Regression
 
-    For using with Numpy, assuming 2 GPUs:
+    For using with Numpy:
 
     .. code-block:: python
 
@@ -137,29 +135,26 @@ class LinearRegressionMG:
 
 
         X = np.array([
-        [1.0, 11.0, 21.0, 31.0, 41.0, 51.0, 1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
-        [2.0, 12.0, 22.0, 32.0, 42.0, 52.0, 2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
-        [3.0, 13.0, 23.0, 33.0, 43.0, 53.0, 3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
-        [4.0, 14.0, 24.0, 34.0, 44.0, 54.0, 4.0, 14.0, 24.0, 34.0, 44.0, 54.0],
-        [1.0, 11.0, 21.0, 31.0, 41.0, 51.0, 1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
-        [2.0, 12.0, 22.0, 32.0, 42.0, 52.0, 2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
-        [3.0, 13.0, 23.0, 33.0, 43.0, 53.0, 3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
-        [4.0, 14.0, 24.0, 34.0, 44.0, 54.0, 4.0, 14.0, 24.0, 34.0, 44.0, 54.0],
-        [1.0, 11.0, 21.0, 31.0, 41.0, 51.0, 1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
-        [2.0, 12.0, 22.0, 32.0, 42.0, 52.0, 2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
-        [3.0, 13.0, 23.0, 33.0, 43.0, 53.0, 3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
-        [4.0, 14.0, 24.0, 34.0, 44.0, 54.0, 4.0, 14.0, 24.0, 34.0, 44.0, 54.0],
-        [1.0, 11.0, 21.0, 31.0, 41.0, 51.0, 1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
-        [2.0, 12.0, 22.0, 32.0, 42.0, 52.0, 2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
-        [3.0, 13.0, 23.0, 33.0, 43.0, 53.0, 3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
-        [4.0, 14.0, 24.0, 34.0, 44.0, 54.0, 4.0, 14.0, 24.0, 34.0, 44.0, 54.0]
-        ], dtype=np.float32)
+        [ 1.0, 11.0, 21.0, 31.0, 41.0, 51.0,  1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
+        [ 2.0, 12.0, 22.0, 32.0, 42.0, 52.0,  2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
+        [ 3.0, 13.0, 23.0, 33.0, 43.0, 53.0,  3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
+        [ 4.0, 14.0, 24.0, 34.0, 44.0, 54.0,  4.0, 14.0, 24.0, 34.0, 44.0, 54.0],
+        [ 1.0, 11.0, 21.0, 31.0, 41.0, 51.0,  1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
+        [ 2.0, 12.0, 22.0, 32.0, 42.0, 52.0,  2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
+        [ 3.0, 13.0, 23.0, 33.0, 43.0, 53.0,  3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
+        [ 4.0, 14.0, 24.0, 34.0, 44.0, 54.0,  4.0, 14.0, 24.0, 34.0, 44.0, 54.0],
+        [ 1.0, 11.0, 21.0, 31.0, 41.0, 51.0,  1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
+        [ 2.0, 12.0, 22.0, 32.0, 42.0, 52.0,  2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
+        [ 3.0, 13.0, 23.0, 33.0, 43.0, 53.0,  3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
+        [ 4.0, 14.0, 24.0, 34.0, 44.0, 54.0,  4.0, 14.0, 24.0, 34.0, 44.0, 54.0],
+        [ 1.0, 11.0, 21.0, 31.0, 41.0, 51.0,  1.0, 11.0, 21.0, 31.0, 41.0, 51.0],
+        [ 2.0, 12.0, 22.0, 32.0, 42.0, 52.0,  2.0, 12.0, 22.0, 32.0, 42.0, 52.0],
+        [ 3.0, 13.0, 23.0, 33.0, 43.0, 53.0,  3.0, 13.0, 23.0, 33.0, 43.0, 53.0],
+        [ 4.0, 14.0, 24.0, 34.0, 44.0, 54.0,  4.0, 14.0, 24.0, 34.0, 44.0, 54.0]], dtype=np.float32)
 
 
 
-        y = np.array([60.0, 61.0, 62.0, 63.0, 60.0, 61.0, 62.0, 63.0, 60.0,
-                      61.0, 62.0, 63.0, 60.0, 61.0, 62.0, 63.0],
-                     dtype=np.float32)
+        y = np.array([60.0, 61.0, 62.0, 63.0, 60.0, 61.0, 62.0, 63.0, 60.0, 61.0, 62.0, 63.0, 60.0, 61.0, 62.0, 63.0], dtype=np.float32)
 
         lr = LinearRegression()
 
@@ -167,6 +162,7 @@ class LinearRegressionMG:
 
 
     To use with Dask, please see the LinearRegression in dask-cuml.
+
 
     """
 
@@ -177,12 +173,9 @@ class LinearRegressionMG:
 
         Parameters
         ----------
-        algorithm : Type: string. 'eig' (default) and 'svd' are supported
-        algorithms.
-        fit_intercept: boolean. For more information, see `scikitlearn's OLS
-        <https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html>`_.
-        normalize: boolean. For more information, see `scikitlearn's OLS
-        <https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html>`_.
+        algorithm : Type: string. 'eig' (default) and 'svd' are supported algorithms.
+        fit_intercept: boolean. For more information, see `scikitlearn's OLS <https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html>`_.
+        normalize: boolean. For more information, see `scikitlearn's OLS <https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html>`_.
 
         """
         self.coef_ = None
@@ -225,8 +218,7 @@ class LinearRegressionMG:
            Dense vector (floats or doubles) of shape (n_samples, 1)
 
         n_gpus : int
-                 Number of gpus to be used for prediction. If gpu_ids parameter
-                 has more than element, this parameter is ignored.
+                 Number of gpus to be used for prediction. If gpu_ids parameter has more than element, this parameter is ignored.
 
         gpu_ids: int array
                  GPU ids to be used for prediction.
@@ -253,8 +245,7 @@ class LinearRegressionMG:
             Dense matrix (floats or doubles) of shape (n_samples, n_features)
 
         n_gpus : int
-                 Number of gpus to be used for prediction. If gpu_ids parameter
-                 has more than element, this parameter is ignored.
+                 Number of gpus to be used for prediction. If gpu_ids parameter has more than element, this parameter is ignored.
 
         gpu_ids: int array
                  GPU ids to be used for prediction.
@@ -276,18 +267,17 @@ class LinearRegressionMG:
             raise ValueError('Number of GPUS should be 2 or more'
                              'For single GPU, use the normal LinearRegression')
 
+
     def _fit_spmg(self, X, y, gpu_ids):
         # Using numpy ctypes pointer to avoid cimport numpy for abi issues
         # Future improvement change saving this coefs as distributed in gpus
 
         if (not isinstance(X, np.ndarray)):
-            msg = "X matrix must be a Numpy ndarray." \
-                  " Dask will be supported in the next version."
+            msg = "X matrix must be a Numpy ndarray. Dask will be supported in the next version."
             raise TypeError(msg)
 
         if (not isinstance(y, np.ndarray)):
-            msg = "y matrix must be a Numpy ndarray." \
-                  " Dask will be supported in the next version."
+            msg = "y matrix must be a Numpy ndarray. Dask will be supported in the next version."
             raise TypeError(msg)
 
         n_gpus = len(gpu_ids)
@@ -322,7 +312,7 @@ class LinearRegressionMG:
         cdef uintptr_t X_ptr, y_ptr, gpu_ids_ptr, coef_ptr
 
         self.gdf_datatype = X.dtype
-        self.coef_ = zeros(X.shape[1], dtype=X.dtype)
+        self.coef_ = np.zeros(X.shape[1], dtype=X.dtype)
 
         X_ptr = X.ctypes.data
         y_ptr = y.ctypes.data
@@ -363,6 +353,7 @@ class LinearRegressionMG:
 
         return self
 
+
     def _predict_spmg(self, X, gpu_ids):
 
         n_gpus = len(gpu_ids)
@@ -381,7 +372,7 @@ class LinearRegressionMG:
             msg = "X must have a column."
             raise TypeError(msg)
 
-        pred = zeros(n_rows, dtype=X.dtype)
+        pred = np.zeros(n_rows, dtype=X.dtype)
 
         cdef uintptr_t X_ptr, pred_ptr, gpu_ids_ptr, coef_ptr
 
@@ -398,7 +389,7 @@ class LinearRegressionMG:
                            <int> n_rows,
                            <int> n_cols,
                            <float*>coef_ptr,
-                           <float>self.intercept_,
+                   <float>self.intercept_,
                            <float*>pred_ptr,
                            <int*>gpu_ids_ptr,
                            <int>n_gpus)
@@ -408,12 +399,13 @@ class LinearRegressionMG:
                            <int> n_rows,
                            <int> n_cols,
                            <double*>coef_ptr,
-                           <double>self.intercept_,
+                   <double>self.intercept_,
                            <double*>pred_ptr,
                            <int*>gpu_ids_ptr,
                            <int>n_gpus)
 
         return pred
+
 
     def _fit_mg(self, alloc_info, params):
 
@@ -477,17 +469,17 @@ class LinearRegressionMG:
                 idx = idx + 1
 
             spmgOlsFit(<float**> input32,
-                       <int*> input_cols,
-                       <int> n_rows,
-                       <int> n_cols,
-                       <float**> labels32,
-                       <int*> label_rows,
-                       <float**> coef32,
-                       <int*> coef_cols,
-                       <float*> &intercept_f32,
-                       <bool> self.fit_intercept,
-                       <bool> self.normalize,
-                       <int> n_allocs)
+                           <int*> input_cols,
+                           <int> n_rows,
+                           <int> n_cols,
+                           <float**> labels32,
+                           <int*> label_rows,
+                           <float**> coef32,
+                           <int*> coef_cols,
+                           <float*> &intercept_f32,
+                           <bool> self.fit_intercept,
+                           <bool> self.normalize,
+                           <int> n_allocs)
 
             return intercept_f32
 
@@ -515,19 +507,20 @@ class LinearRegressionMG:
                 idx = idx + 1
 
             spmgOlsFit(<double**> input64,
-                       <int*> input_cols,
-                       <int> n_rows,
-                       <int> n_cols,
-                       <double**> labels64,
-                       <int*> label_rows,
-                       <double**> coef64,
-                       <int*> coef_cols,
-                       <double*> &intercept_f64,
-                       <bool> self.fit_intercept,
-                       <bool> self.normalize,
-                       <int> n_allocs)
+                        <int*> input_cols,
+                        <int> n_rows,
+                        <int> n_cols,
+                        <double**> labels64,
+                        <int*> label_rows,
+                        <double**> coef64,
+                        <int*> coef_cols,
+                        <double*> &intercept_f64,
+                        <bool> self.fit_intercept,
+                        <bool> self.normalize,
+                        <int> n_allocs)
 
             return intercept_f64
+
 
     def _predict_mg(self, alloc_info, intercept, params):
 
@@ -587,15 +580,15 @@ class LinearRegressionMG:
                 idx = idx + 1
 
             spmgOlsPredict(<float**>input32,
-                           <int*>input_cols,
-                           <int> n_rows,
-                           <int> n_cols,
-                           <float**>coef32,
-                           <int*>coef_cols,
-                           <float>intercept,
-                           <float**>pred32,
-                           <int*>pred_rows,
-                           <int> n_allocs)
+                            <int*>input_cols,
+                            <int> n_rows,
+                            <int> n_cols,
+                            <float**>coef32,
+                            <int*>coef_cols,
+                            <float>intercept,
+                            <float**>pred32,
+                            <int*>pred_rows,
+                            <int> n_allocs)
 
         else:
 
@@ -621,12 +614,12 @@ class LinearRegressionMG:
                 idx = idx + 1
 
             spmgOlsPredict(<double**>input64,
-                           <int*>input_cols,
-                           <int> n_rows,
-                           <int> n_cols,
-                           <double**>coef64,
-                           <int*>coef_cols,
-                           <double>intercept,
-                           <double**>pred64,
-                           <int*>pred_rows,
-                           <int> n_allocs)
+                               <int*>input_cols,
+                               <int> n_rows,
+                               <int> n_cols,
+                               <double**>coef64,
+                               <int*>coef_cols,
+                               <double>intercept,
+                               <double**>pred64,
+                               <int*>pred_rows,
+                               <int> n_allocs)

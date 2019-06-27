@@ -1,3 +1,5 @@
+CMAKE_COMMON_VARIABLES=" -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX11_ABI=$BUILD_ABI"
+
 
 if [ -n "$MACOSX_DEPLOYMENT_TARGET" ]; then
     # C++11 requires 10.9
@@ -9,5 +11,12 @@ fi
 printenv
 # Cleanup local git
 git clean -xdf
-
-./build.sh clean libcuml -v --allgpuarch
+# Change directory for build process
+cd cuML
+# Use CMake-based build procedure
+mkdir build
+cd build
+# configure
+cmake $CMAKE_COMMON_VARIABLES ..
+# build
+make -j${PARALLEL_LEVEL} VERBOSE=1 install
