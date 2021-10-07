@@ -85,6 +85,7 @@ DISABLE_FORCE_CLONE_RAFT=OFF
 #         CONDA_PREFIX, but there is no fallback from there!
 INSTALL_PREFIX=${INSTALL_PREFIX:=${PREFIX:=${CONDA_PREFIX}}}
 PARALLEL_LEVEL=${PARALLEL_LEVEL:=""}
+CPM_raft_SOURCE=${CPM_raft_SOURCE:=""}
 
 # Default to Ninja if generator is not specified
 export CMAKE_GENERATOR="${CMAKE_GENERATOR:=Ninja}"
@@ -288,6 +289,10 @@ if completeBuild || hasArg libcuml || hasArg prims || hasArg bench || hasArg cpp
     if [ ! -z ${PARALLEL_LEVEL} ]
     then
       build_args="-j${PARALLEL_LEVEL} ${build_args}"
+    fi
+    if [ ! -z ${CPM_raft_SOURCE} ]
+    then
+      build_args="-DCPM_raft_SOURCE=${CPM_raft_SOURCE} ${build_args}"
     fi
     cmake --build ${LIBCUML_BUILD_DIR} ${build_args}
 fi

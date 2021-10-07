@@ -72,6 +72,10 @@ if [[ -z "$PROJECT_FLASH" || "$PROJECT_FLASH" == "0" ]]; then
 else
   if [ "$BUILD_LIBCUML" == '1' ]; then
     gpuci_logger "PROJECT FLASH: Build conda pkg for libcuml"
+    RAFT_BRANCH="branch-$(echo `git describe --tags` | grep -o -E '([0-9]+\.[0-9]+)')"
+    export CPM_raft_SOURCE="$WORKSPACE/raft-$RAFT_BRANCH"
+    gpuci_logger "Cloning raft into $CPM_raft_SOURCE"
+    git clone https://github.com/rapidsai/raft.git --depth 1 --branch "$RAFT_BRANCH" "$CPM_raft_SOURCE"
     gpuci_conda_retry build --no-build-id --croot ${CONDA_BLD_DIR} conda/recipes/libcuml --dirty --no-remove-work-dir
     mkdir -p ${CONDA_BLD_DIR}/libcuml/work
     cp -r ${CONDA_BLD_DIR}/work/* ${CONDA_BLD_DIR}/libcuml/work
@@ -94,4 +98,3 @@ fi
 
 gpuci_logger "Upload conda pkgs"
 source ci/cpu/upload.sh
-
