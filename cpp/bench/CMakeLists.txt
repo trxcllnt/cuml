@@ -44,6 +44,9 @@ if(BUILD_CUML_BENCH)
     PUBLIC
       cuml::${CUML_CPP_TARGET}
       benchmark::benchmark
+      raft::raft
+      raft::raft_nn
+      raft::raft_distance
       ${TREELITE_LIBS}
   )
 
@@ -83,6 +86,9 @@ if(BUILD_CUML_PRIMS_BENCH)
     PUBLIC
       cuml::${CUML_CPP_TARGET}
       benchmark::benchmark
+      raft::raft
+      raft::raft_nn
+      raft::raft_distance
       ${TREELITE_LIBS}
   )
 
