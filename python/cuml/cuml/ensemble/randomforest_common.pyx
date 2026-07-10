@@ -276,9 +276,9 @@ class BaseRandomForestModel(InteropMixin, Base):
         if hasattr(model, 'oob_score_'):
             attrs["oob_score_"] = model.oob_score_
         if hasattr(model, 'oob_decision_function_'):
-            attrs["oob_decision_function_"] = model.oob_decision_function_
+            attrs["oob_decision_function_"] = cp.asarray(model.oob_decision_function_)
         if hasattr(model, 'oob_prediction_'):
-            attrs["oob_prediction_"] = model.oob_prediction_
+            attrs["oob_prediction_"] = cp.asarray(model.oob_prediction_)
         # Note: feature_importances_ is NOT transferred from sklearn to cuML
         # because cuML caches the impurity decrease directly (BestMetric()) which
         # is not available in sklearn models created via treelite export
@@ -299,9 +299,9 @@ class BaseRandomForestModel(InteropMixin, Base):
         if hasattr(self, 'oob_score_'):
             attrs["oob_score_"] = self.oob_score_
         if hasattr(self, 'oob_decision_function_'):
-            attrs["oob_decision_function_"] = self.oob_decision_function_
+            attrs["oob_decision_function_"] = self.oob_decision_function_.get(order="A")
         if hasattr(self, 'oob_prediction_'):
-            attrs["oob_prediction_"] = self.oob_prediction_
+            attrs["oob_prediction_"] = self.oob_prediction_.get(order="A")
         # Note: feature_importances_ is NOT transferred from cuML to sklearn
         # because sklearn's computation requires tree impurities that aren't
         # available in sklearn models created via treelite export
