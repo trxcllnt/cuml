@@ -2,7 +2,7 @@ Examples
 ========
 
 Here we provide a few examples of using ``cuml.accel``. The code for the
-examples in this section is available in the cuML GitHub repository at `<https://github.com/NVIDIA/cuml/tree/HEAD/docs/source/cuml-accel/examples>`__.
+examples in this section is available in the cuML GitHub repository at `<https://github.com/NVIDIA/cuml/tree/main/docs/source/cuml-accel/examples>`__.
 
 .. toctree::
    :maxdepth: 1
