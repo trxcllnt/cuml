@@ -525,8 +525,6 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
         - If ``"auto"``, the offset is set to -0.5.
         - If float, must be in the range (0, 0.5] and the offset is set to
           the corresponding training-score quantile.
-    warm_start : bool, default=False
-        ``warm_start=True`` is not currently supported.
     verbose : int or boolean, default=False
         Sets logging level. It must be one of `cuml.common.logger.level_*`.
         See :ref:`verbosity-levels` for more info.
@@ -584,7 +582,6 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
         bootstrap=False,
         random_state=None,
         contamination="auto",
-        warm_start=False,
         verbose=False,
         output_type=None,
     ):
@@ -604,7 +601,6 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
         self.bootstrap = bootstrap
         self.random_state = random_state
         self.contamination = contamination
-        self.warm_start = warm_start
 
     @classmethod
     def _get_param_names(cls):
@@ -617,7 +613,6 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
             "bootstrap",
             "random_state",
             "contamination",
-            "warm_start",
         ]
 
     @classmethod
@@ -633,7 +628,6 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
             "bootstrap": model.bootstrap,
             "random_state": model.random_state,
             "contamination": model.contamination,
-            "warm_start": model.warm_start,
         }
 
     def _params_to_cpu(self):
@@ -645,7 +639,6 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
             "bootstrap": self.bootstrap,
             "random_state": self.random_state,
             "contamination": self.contamination,
-            "warm_start": self.warm_start,
         }
 
     def _attrs_from_cpu(self, model):
@@ -722,7 +715,7 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
         self.__dict__.update(state)
 
     @mlfunc(set_input_type=True)
-    def fit(self, X, y=None, sample_weight=None):
+    def fit(self, X, y=None):
         """
         Fit the Isolation Forest model.
 
@@ -733,19 +726,12 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
             or float64.
         y : Ignored
             Not used, present for API consistency.
-        sample_weight : array-like of shape (n_samples,), default=None
-            Not currently supported.
 
         Returns
         -------
         self : IsolationForest
             Fitted estimator.
         """
-        if self.warm_start:
-            raise UnsupportedOnGPU("`warm_start=True` is not supported")
-        if sample_weight is not None:
-            raise UnsupportedOnGPU("`sample_weight` is not supported")
-
         # Release any existing native model.
         self._model = None
 
@@ -1201,7 +1187,7 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
         return -predictions
 
     @mlfunc(preserve_index=True)
-    def fit_predict(self, X, y=None, sample_weight=None):
+    def fit_predict(self, X, y=None):
         """
         Fit the model and predict on X.
 
@@ -1211,12 +1197,10 @@ class IsolationForest(InteropMixin, CMajorInputTagMixin, Base):
             The input samples.
         y : Ignored
             Not used, present for API consistency.
-        sample_weight : array-like of shape (n_samples,), default=None
-            Not currently supported.
 
         Returns
         -------
         labels : ndarray of shape (n_samples,)
             1 for inliers, -1 for outliers.
         """
-        return self.fit(X, sample_weight=sample_weight).predict(X)
+        return self.fit(X).predict(X)

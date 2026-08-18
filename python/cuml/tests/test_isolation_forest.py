@@ -296,22 +296,6 @@ def test_bootstrap_parameter(blobs_data, bootstrap):
     assert predictions.shape[0] == blobs_data.shape[0]
 
 
-def test_unsupported_sample_weight(blobs_data):
-    """sample_weight should fail explicitly until backend support is added."""
-    clf = cuIsolationForest(n_estimators=10, random_state=42)
-
-    with pytest.raises(UnsupportedOnGPU, match="sample_weight"):
-        clf.fit(blobs_data, sample_weight=np.ones(blobs_data.shape[0]))
-
-
-def test_unsupported_warm_start(blobs_data):
-    """warm_start=True should fail explicitly."""
-    clf = cuIsolationForest(n_estimators=10, random_state=42, warm_start=True)
-
-    with pytest.raises(UnsupportedOnGPU, match="warm_start"):
-        clf.fit(blobs_data)
-
-
 def test_unfitted_sklearn_conversion_preserves_parameters():
     """Unfitted estimators may still be converted in either direction."""
     cu_model = cuIsolationForest(n_estimators=7, random_state=42)
